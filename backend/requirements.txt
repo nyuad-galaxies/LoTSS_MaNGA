@@ -1,0 +1,14 @@
+numpy
+astropy
+django
+psycopg2
+gunicorn
+whitenoise
+requests
+django-cors-headers
+git+https://github.com/ivan-katkov/django-custom-query.git#egg=django-custom-query
+django-filter
+djangorestframework
+django-debug-toolbar
+drf-yasg
+drf-flex-fields

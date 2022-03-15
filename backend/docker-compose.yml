@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  lotss_postgres:
+    container_name: postgres_lotss_api
+    image: katkov/postgres_q3c
+    environment:
+      - POSTGRES_USER=lotss_user
+      - POSTGRES_DB=lotss_db
+      - POSTGRES_PASSWORD=postgres
+    # ports:
+    #   - '5437:5432'
+    volumes:
+      - ../data/postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ['CMD', 'sh', '-c', 'pg_isready -U $$POSTGRES_USER -h $$(hostname -i)']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  lotss_api:
+    container_name: lotss_api
+    depends_on:
+      - lotss_postgres
+    build: .
+    ports:
+      - '8085:8085'
+    volumes:
+      - ./:/code
+      - ../prep:/prep
+      - ../data:/data
+    environment:
+      - DJANGO_SECRET_KEY=django_topsecret
+      - DJANGO_DEBUG=True
+      - DB_HOST=lotss_postgres
+      - DB_NAME=lotss_db
+      - DB_USER=lotss_user
+      - DB_PASSWORD=postgres
+      - DB_PORT=5432
+      - SILKY_INTERCEPT_PERCENT=0
+    command: bash -c "
+      psql postgresql://$$DB_USER:$$DB_PASSWORD@$$DB_HOST:$$DB_PORT/$$DB_NAME -c '\\dt+' &&
+      python manage.py makemigrations &&
+      python manage.py migrate --noinput &&
+      python manage.py collectstatic --noinput --link -v 2 &&
+      gunicorn website.wsgi --reload --workers 1 --bind 0.0.0.0:8085 --timeout 180 --limit-request-line 8190 --log-level debug --access-logfile - --error-logfile -"
+    restart:
+      on-failure:10
+
+      # cd /prep &&
+      # psql postgresql://$$DB_USER:$$DB_PASSWORD@$$DB_HOST:$$DB_PORT/$$DB_NAME -c '\\i load_pipe3d.sql' &&
+      # psql postgresql://$$DB_USER:$$DB_PASSWORD@$$DB_HOST:$$DB_PORT/$$DB_NAME -c '\\i load_data.sql' &&
+
+      # psql postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME
