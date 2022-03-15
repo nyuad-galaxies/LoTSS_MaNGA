@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG') == 'True'
 
-ALLOWED_HOSTS = ['lotss.voxastro.org']
+ALLOWED_HOSTS = ['api-lotss.voxastro.org',]
 
 CORS_ORIGIN_WHITELIST = [
     "https://lotss.voxastro.org",
