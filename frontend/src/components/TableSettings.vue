@@ -75,7 +75,7 @@ export default defineComponent({
         store.commit('setTableStatus', null)
         store.commit('setSesameStatus', null)
         store.commit('setSesameMessage', '')
-        store.commit('setQueryString', 'p3d != null')
+        store.commit('setQueryString', 'p3d IS NOT null')
         store.dispatch('fetchTable')
       }
     }
